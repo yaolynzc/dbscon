@@ -31,12 +31,20 @@ var torlists = {
   FILES: JSON.stringify(parsedTorrent.files)
 }
 
-// 保存对象
-client.hmset(torlists.ID.toString(), torlists, function (error, res) {
-  if (error) {
-    console.log(error);
-  } else {
-    // console.log(res);
+client.multi([
+  ["incr", "id"]
+]).exec(function (error, res) {
+  console.log(res[0]);
+  // 保存对象
+  if (res.length > 0) {
+    client.hmset(torlists.ID, torlists, function (error, res) {
+      if (error) {
+        console.log(error);
+      } else {
+        // console.log(res);
+        client.sadd("torlists", torlists.ID);
+      }
+    });
   }
 });
 
@@ -44,22 +52,23 @@ client.keys('*',function (error, res) {
   if (error) {
     console.log(error);
   } else {
-    console.log(res);
 
     if(res.length > 1){
       for(var i of res){
-        // console.log(i);
-        client.hgetall(i.toString(),function(error,res){
-          if(error){
-            console.log(error);
-          }else{
-            console.log(res);
-          }
-        });
+        // id：属于string类型，torlists：属于无序集合类型，都无法使用hgetall命令
+        if (i != "id" && i != "torlists") {
+          client.hgetall(i.toString(), function (error, res) {
+            if (error) {
+              console.log(error);
+            } else {
+              console.log(res);
+            }
+          });
+        }
       }
-      
-    // // 关闭链接
-    // client.end(true);
     }
   }
 });
+
+// 关闭链接
+// client.end(true);
