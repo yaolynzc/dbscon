@@ -5,10 +5,10 @@ var torparser = require("torrent-parser");
 var mysql = require('mysql');
 // 2.设置mysql连接参数
 var connection = mysql.createConnection({
-    host     : '52.69.238.26',
+    host     : '220.249.123.34',
     user     : 'root',
     password : 'flame',
-    database : 'sp2web'
+    database : 'leador123456'
   });
 
 // 解析torrent文件
